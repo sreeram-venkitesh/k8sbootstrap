@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/sreeram-venkitesh/k8sbootstrap/pkg/phases/certificates"
 	"github.com/sreeram-venkitesh/k8sbootstrap/pkg/phases/preflight"
 )
 
@@ -16,6 +17,10 @@ func newCmdInit() *cobra.Command {
 
 			if err := preflight.RunPreflightChecks(); err != nil {
 				fmt.Printf("[preflight] Preflight checks failed: %s\n", err)
+			}
+
+			if err := certificates.SetupCerts(); err != nil {
+				fmt.Printf("[certificate] Certificate creation failed: %s\n", err)
 			}
 
 			return nil
