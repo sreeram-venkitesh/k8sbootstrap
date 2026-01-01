@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/sreeram-venkitesh/k8sbootstrap/pkg/phases/certificates"
 	"github.com/sreeram-venkitesh/k8sbootstrap/pkg/phases/kubeconfig"
+	"github.com/sreeram-venkitesh/k8sbootstrap/pkg/phases/manifests"
 	"github.com/sreeram-venkitesh/k8sbootstrap/pkg/phases/preflight"
 )
 
@@ -31,6 +32,10 @@ func newCmdInit() *cobra.Command {
 
 			if err := kubeconfig.SetupKubeconfigs(advertiseAddress); err != nil {
 				fmt.Printf("[kubeconfig] Kubeconfig creation failed: %s\n", err)
+			}
+
+			if err := manifests.SetupStaticPodManifests(advertiseAddress); err != nil {
+				fmt.Printf("[manifests] Static pod manifest creation failed: %s\n", err)
 			}
 
 			return nil
