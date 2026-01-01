@@ -1,9 +1,11 @@
 package certificates
 
 import (
+	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"os"
 )
 
@@ -48,4 +50,30 @@ func createKubernetesCA() error {
 	fmt.Println("[certificate] CA certificate successfully generated")
 
 	return nil
+}
+
+func loadCA() (*x509.Certificate, *rsa.PrivateKey, error) {
+	caCertPEM, err := ioutil.ReadFile("/etc/kubernetes/pki/ca.crt")
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to load CA cert: %w", err)
+	}
+
+	block, _ := pem.Decode(caCertPEM)
+	caCert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to parse CA cert: %w", err)
+	}
+
+	caKeyPEM, err := ioutil.ReadFile("/etc/kubernetes/pki/ca.key")
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to load CA key: %w", err)
+	}
+
+	block, _ = pem.Decode(caKeyPEM)
+	caKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to parse CA key: %w", err)
+	}
+
+	return caCert, caKey, nil
 }
